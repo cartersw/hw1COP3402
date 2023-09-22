@@ -1,0 +1,125 @@
+// Hi! These "//" lines are my own personal comments and additions.
+
+SIMPLIFIED RISC MACHINE MANUAL
+
+Goal: Implementing a Virtual Machine taking a binary object file (.bof) and producing two outputs:
+	.myo (Tracing)
+	.myp (the output)
+
+Hw1-tests:
+	Assembler, Makefile (script managing build systems for software projects), VM Test Cases
+
+Makefiles are scripts that help you to manage your code. We don't need to make the Makefile, it is given.
+There are some commands you can use to your advantage that are handled by the make file.
+Great since there are several different modules.
+In the terminal/linux, you can use "cad Makefile" to see what is inside of it.
+
+Each test case has 4 files: asm, bof, lst, out.
+asm Assembler Machine Code
+bof Binary Object File (Assembler [asm] output, VM input)
+lst Tracing Output File
+out Output File
+
+vm_test0.asm
+
+		# $Id: vm_test0.asm,v 1.1 2023/09/18 03:32:18 leavens Exp $
+		.text start
+	
+start:	STRA
+		ADDI $0, $t0, 1
+		EXIT
+		.data 1024
+		.stack 4096
+		.end
+		
+vm_test0.bof
+0000000 047502 000106 000000 000000 000014 000000 0020000 000000
+so on
+
+vm_test0.lst (.myp)
+
+Addr Instruction
+	0 STRA
+	4 ADDI $0, $t0, 1
+	8 EXIT
+	 1024: 0	...
+	
+vm_test0.out (.myo)
+PC: 0
+GPR[$0 ]: 0		GPR[$at]: 0		GPR[$v0]: 0		so on
+GPR[$a2]: 0		GPR[$a3]: 0		GPR[$t0]: 0		so on
+so on
+
+GPR = General Purpose Register
+PC	= Program Counter
+
+
+Our goal is to create code that converts the asm to myp and myo.
+
+
+
+RUNNING THE CODE
+
+All files & test cases should be in the current directory.
+Commands to run the code:
+	make
+		Compiles ASM and VM together (does not work w/o vm)
+	make asm
+		Builds the assembler
+	./asm vm_test0.asm
+		Runs the ASM and produces vm_test0.bof
+	./vm vm_test0.bof
+		Runs the VM and prints the tracing
+	./vm -p vm_test0.bof
+		Prints the output file
+
+When using the test cases yourself, remove the files that are not the asm because the asm creates the other required files.
+Write your code in a way that works on the asm file.
+the bof file exists "because the professor wants it to be more realistic" (??)
+You don't need to care about the bof file, just understand some basic concepts to help you with the vm ???
+
+
+
+WHAT'S IN THE MAKE PROCESS?
+
+A lot of gcc compile commands
+Make asm is similar, there are a lot of gcc commands put together.
+When running vm_test0.asm, there will be no output.
+When running test0.bof, the myo will be output.
+
+// There seems to be a lot of confusion about the bof file, as we're told not to worry about it although it's our input. Its purpose feels vague.
+	With the included bof header file, which is included in the hw description, provides you with some background information for bofs.
+	Instruction.h is also very important and useful. We don't need to implement them, only understand them.
+	We'll be creating our own functions and we're using bof, instruction, etc.
+	// So, to summarize, I think importing the bof library's functions let us use the bof file without us needing to understand the bof itself.
+	// We're given a disassembler as well which converts bof into asm? // I think? I think that's what she said
+
+When running it with -p, that's when the myo and myp files are created.
+
+
+
+OTHER USEFUL MAKE COMMANDS
+
+make vm_test0.myo
+	Creates vm_test0.myo file
+make vm_test0.myp
+	"			   ".myp file
+make clean
+	Cleans up the directory
+	rm -f *~ *.o *.myo '#'*
+	removes everything created basically, fresh start
+	
+	
+	
+MEMORY
+
+We have 3 sections, Text Data and Stack sections.
+PC (counter) points at the TEXT section, which contains the instructions (starting at 0)
+GP points to the DATA section (global and static data or vars, 1024)
+FP (frame pointer) and SP (stack pointer) point to the BOTTOM of the Stack (the stack moves towards 0 instead of towards end. Starts at 4096)
+PC < GP < SP/FP, always.
+
+
+SRM'S ASSEMBLY LANGUAGE
+	we ran out of time, check the slides
+	Important: Current AR (activation record) is between FP and SP.
